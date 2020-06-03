@@ -50,6 +50,7 @@ def SetColors(pid):
     XC.text_properties['color'][1] = XC.EDep_color
     XC.text_properties['color'][2] = XC.EDep_color
     XC.text_properties['color'][3] = XC.EDep_color
+    XC.text_properties['color'][14] = XC.Credit_color
     for a in range(1, len(XC.arrow_properties['color'])):
         if (pid == 'ER'):
             XC.arrow_properties['color'][a] = XC.ER_color
@@ -64,9 +65,6 @@ def SetText(pid, eDep, field):
     
     if (pid == 'ER'):
         XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Electronic', 'ER')
-        print(XC.text_properties['template'][0])
-        print(XC.text_properties['template'][0] % ('Electronic', 'ER'))
-        print(XC.text_properties['text'][0])
     elif (pid == 'NR'):
         XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Nuclear', 'NR')
 
@@ -179,13 +177,20 @@ def DrawText(fig, ax, text_id):
 
 def DrawAtom(fig, ax, pid):
     
+    imat = plt.imread('Atom.png')
+    imatax = fig.add_axes([XC.atom_left_posr, XC.atom_bottom_posr, XC.atom_widthr, XC.atom_heightr], anchor='NE', zorder=-1)
+    imatax.imshow(imat)
+    imatax.axis('off')
+
+    imre = plt.imread('Recoil.png')
     if (pid == 'NR'):
-        im = plt.imread('Atom_NR.png')
+        imreax = fig.add_axes([XC.recoil_NR_left_posr, XC.recoil_NR_bottom_posr, XC.recoil_NR_widthr, XC.recoil_NR_heightr],
+            anchor='NE', zorder=-1)
     elif (pid == 'ER'):
-        im = plt.imread('Atom_ER.png')
-    imax = fig.add_axes([XC.atom_left_posr, XC.atom_bottom_posr, XC.atom_widthr, XC.atom_heightr], anchor='NE', zorder=-1)
-    imax.imshow(im)
-    imax.axis('off')
+        imreax = fig.add_axes([XC.recoil_ER_left_posr, XC.recoil_ER_bottom_posr, XC.recoil_ER_widthr, XC.recoil_ER_heightr],
+            anchor='NE', zorder=-1)
+    imreax.imshow(imre)
+    imreax.axis('off')
 
 
 
