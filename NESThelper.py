@@ -1,7 +1,13 @@
-from NESThelper import *
-import DetectorConfig as DC
 import numpy as np
 from scipy.special import erf
+import DetectorConfig as DC
+from NESThelper import *
+
+
+
+### Global variables that should not be changed
+DensityRef = 2.90
+XeAtomNumber = 54.
 
 
 
@@ -22,7 +28,7 @@ def GetYieldNR(energy, dfield, density, randomIsotope=0, massNumber=0, detectorM
         ScaleFactor[1] = 1.
         
     Nq = NuisParam[0] * pow(energy, NuisParam[1])
-    ThomasImel = NuisParam[2] * pow(dfield, NuisParam[3]) * pow(density / DC.DensityRef, 0.3)
+    ThomasImel = NuisParam[2] * pow(dfield, NuisParam[3]) * pow(density / DensityRef, 0.3)
     Qy = 1. / (ThomasImel * pow(energy + NuisParam[4], NuisParam[9]))
     Qy *= 1. - 1. / pow(1. + pow((energy / NuisParam[5]), NuisParam[6]), NuisParam[10])
     Ly = Nq / energy - Qy
@@ -102,7 +108,7 @@ def WorkFunction(density):
     I_ion = 9. + (12.13 - 9.) / (1. + pow(density / 2.953, 65.))
     I_exc = I_ion / 1.46
     Wq_eV = I_exc * (alpha / (1. + alpha)) + I_ion / (1. + alpha) + xi_se / (1. + alpha)
-    eDensity = (density / DC.DetectorMolarMass) * 6.022e23 * DC.XeAtomNumber
+    eDensity = (density / DC.DetectorMolarMass) * 6.022e23 * XeAtomNumber
     Wq_eV = 20.7 - 1.01e-23 * eDensity
     
     return Wq_eV, alpha

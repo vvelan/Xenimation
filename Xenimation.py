@@ -1,3 +1,5 @@
+import os
+import io
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -6,12 +8,14 @@ from PIL import Image
 import XenimationConfig as XC
 import DetectorConfig as DC
 import NESThelper as nest
-from XenimationHelper import *
+from Xenimation import *
 
 
 
-def GetFlowImage(pid, eDep, field):
+def GetFlowImage(pid, eDep, field, savefig=True, output_dir='./', output_filename='test.png'):
     
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     fig, ax = plt.subplots(1, 1, figsize=(XC.fig_width, XC.fig_height))
     ax.set_xlim([0, XC.axes_xmax])
     ax.set_ylim([XC.axes_ymin, 0])
@@ -40,7 +44,17 @@ def GetFlowImage(pid, eDep, field):
     ax.set_ylim([XC.axes_ymin, 0])
     ax.axis('off')
     fig.tight_layout()
-    fig.savefig('test_%s.png' % pid, transparent=False)
+    if savefig:
+        fig.savefig(output_dir + output_filename, transparent=False)
+        im_out = Image.open(output_dir + output_filename)
+    else:
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        im_out = Image.open(buf)
+
+    plt.close('all')
+    return im_out
 
 
 
