@@ -90,7 +90,6 @@ def GetYieldER(energy, dfield, density):
 
     L = 1.
     SingTripRatio = 0.20 * pow(energy, -0.45 + 0.0005 * dfield)
-    print(SingTripRatio)
     
     return Ni, Nex, Nph, Ne, L, SingTripRatio
 

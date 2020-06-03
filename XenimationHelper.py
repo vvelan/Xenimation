@@ -31,17 +31,16 @@ def GetFlowImage(pid, eDep, field):
     for a in range(len(XC.arrow_properties['name'])):
         DrawArrow(fig, ax, a)
     
-    #for t in range(len(XC.text_properties['name'])):
-    for t in [0, 1, 2, 3, 4, 5, 13]:
+    for t in range(len(XC.text_properties['name'])):
         DrawText(fig, ax, t)
 
     DrawAtom(fig, ax, pid)
-
+    
     ax.set_xlim([0, XC.axes_xmax])
     ax.set_ylim([XC.axes_ymin, 0])
     ax.axis('off')
     fig.tight_layout()
-    fig.savefig('test.png', transparent=False)
+    fig.savefig('test_%s.png' % pid, transparent=False)
 
 
 
@@ -64,12 +63,15 @@ def SetColors(pid):
 def SetText(pid, eDep, field):
     
     if (pid == 'ER'):
-        XC.text_properties['text'][0] = XC.text_properties['text'][0] % ('Electronic', 'ER')
+        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Electronic', 'ER')
+        print(XC.text_properties['template'][0])
+        print(XC.text_properties['template'][0] % ('Electronic', 'ER'))
+        print(XC.text_properties['text'][0])
     elif (pid == 'NR'):
-        XC.text_properties['text'][0] = XC.text_properties['text'][0] % ('Nuclear', 'NR')
+        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Nuclear', 'NR')
 
-    XC.text_properties['text'][2] = XC.text_properties['text'][2] % eDep
-    XC.text_properties['text'][3] = XC.text_properties['text'][3] % field
+    XC.text_properties['text'][2] = XC.text_properties['template'][2] % eDep
+    XC.text_properties['text'][3] = XC.text_properties['template'][3] % field
 
 
 
@@ -170,7 +172,7 @@ def DrawText(fig, ax, text_id):
     t = text_id
     ax.text(XC.text_properties['x'][t], XC.text_properties['y'][t], XC.text_properties['text'][t],
         fontsize=XC.text_properties['fontsize'][t], color=XC.text_properties['color'][t],
-        ha=XC.text_properties['halign'][t],
+        ha=XC.text_properties['halign'][t], va='center',
         fontweight=('bold' * XC.text_properties['bold'][t] + 'normal' * (1 - XC.text_properties['bold'][t])))
 
 
