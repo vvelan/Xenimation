@@ -19,8 +19,14 @@ def GetFlowImage(pid, eDep, field):
     SetColors(pid)
     SetText(pid, eDep, field)
 
-    Ni, Nex, Nph, Ne = nest.GetYieldNR(eDep, field, DC.Density)
-    SetArrowWidths(pid, Ni, Nex, Nph, Ne)
+    if (pid == 'NR'):
+        Ni, Nex, Nph, Ne, L, SingTripRatio = nest.GetYieldNR(eDep, field, DC.Density)
+    elif (pid == 'ER'):
+        Ni, Nex, Nph, Ne, L, SingTripRatio = nest.GetYieldER(eDep, field, DC.Density)
+        # An estimate of how much energy goes into heat for ERs
+        L = 1. - XC.ER_heat_fraction
+
+    SetArrowWidths(pid, Ni, Nex, Nph, Ne, L, SingTripRatio)
     
     for a in range(len(XC.arrow_properties['name'])):
         DrawArrow(fig, ax, a)
@@ -67,14 +73,14 @@ def SetText(pid, eDep, field):
 
 
 
-def SetArrowWidths(pid, Ni, Nex, Nph, Ne):
+def SetArrowWidths(pid, Ni, Nex, Nph, Ne, L, SingTripRatio):
     
-    XC.arrow_properties['w'][1] = XC.arrow_properties['w'][0] * Nex / (Nex + Ni) * (1 - XC.NR_heat_fraction)
-    XC.arrow_properties['w'][2] = XC.arrow_properties['w'][0] * Ni / (Nex + Ni) * (1 - XC.NR_heat_fraction)
-    XC.arrow_properties['w'][3] = XC.arrow_properties['w'][0] * XC.NR_heat_fraction
+    XC.arrow_properties['w'][1] = XC.arrow_properties['w'][0] * Nex / (Nex + Ni) * L
+    XC.arrow_properties['w'][2] = XC.arrow_properties['w'][0] * Ni / (Nex + Ni) * L
+    XC.arrow_properties['w'][3] = XC.arrow_properties['w'][0] * (1 - L)
     XC.arrow_properties['w'][4] = (Ni - Ne) / Ni * XC.arrow_properties['w'][2]
-    XC.arrow_properties['w'][5] = Nph / Nex * XC.arrow_properties['w'][1] * 0.05
-    XC.arrow_properties['w'][6] = Nph / Nex * XC.arrow_properties['w'][1] * 0.95
+    XC.arrow_properties['w'][5] = Nph / Nex * XC.arrow_properties['w'][1] / (1 + 1 / SingTripRatio)
+    XC.arrow_properties['w'][6] = Nph / Nex * XC.arrow_properties['w'][1] / (1 + SingTripRatio)
     XC.arrow_properties['w'][7] = Ne / Ni * XC.arrow_properties['w'][2]
     XC.arrow_properties['w'][8] = Ne / Ni * XC.arrow_properties['w'][2]
     XC.arrow_properties['head_b'] = np.maximum(XC.arrow_properties['w'] * XC.arrow_properties['head_b_scale'],

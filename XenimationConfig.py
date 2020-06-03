@@ -16,8 +16,7 @@ NR_color = '#FF0000'
 ER_color = '#0000FF'
 EDep_color = '#6AA84F'
 
-# Fraction of width going into heat for ER and NR
-NR_heat_fraction = 0.85
+# Fraction of width going into heat for ER
 ER_heat_fraction = 0.27
 
 
@@ -35,8 +34,8 @@ a1_excitation_xr = 0.41
 a1_excitation_yr = 0.33
 a1_excitation_theta = 0.46
 a1_excitation_lr = 0.11
-a2_ionization_xr = 0.41
-a2_ionization_yr = 0.53
+a2_ionization_xr = 0.45
+a2_ionization_yr = 0.63
 a2_ionization_theta = -0.67
 a2_ionization_lr = 0.11
 a3_heat_xr = 0.32
@@ -82,7 +81,7 @@ arrow_properties['head_hr'] = np.full(len(arrow_properties['name']), 0.04)
 arrow_properties['head_h'] = arrow_properties['head_hr'] * axes_xmax
 arrow_properties['min_head_br'] = np.full(len(arrow_properties['name']), 0.04)
 arrow_properties['min_head_b'] = arrow_properties['min_head_br'] * axes_xmax
-arrow_properties['head_b_scale'] = np.full(len(arrow_properties['name']), 1.25)
+arrow_properties['head_b_scale'] = np.full(len(arrow_properties['name']), 1.6)
 
 # Atom position and size
 atom_left_posr = 0.17
@@ -120,7 +119,7 @@ t3_field_halign = 'right'
 t3_field_fontsize = title_fontsize * 0.85
 t3_field_bold = True
 t4_atom_text = 'Xe'
-t4_atom_xr = 0.33
+t4_atom_xr = 0.32
 t4_atom_yr = 0.4
 t4_atom_halign = 'center'
 t4_atom_fontsize = title_fontsize * 1.2

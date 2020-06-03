@@ -1,6 +1,7 @@
 from NESThelper import *
 import DetectorConfig as DC
 import numpy as np
+from scipy.special import erf
 
 
 
@@ -48,8 +49,50 @@ def GetYieldNR(energy, dfield, density, randomIsotope=0, massNumber=0, detectorM
     NexONi = Nex / Ni
     Wq_eV, alpha = WorkFunction(density)
     L = (Nq / energy) * Wq_eV * 1e-3
+    SingTripRatio = (0.21 - 0.0001 * dfield) * pow(energy, 0.21 - 0.0001 * dfield)
 
-    return Ni, Nex, Nph, Ne
+    return Ni, Nex, Nph, Ne, L, SingTripRatio
+
+
+
+def GetYieldER(energy, dfield, density):
+
+    Wq_eV, alpha = WorkFunction(density)
+
+    QyLvllowE = 1e3 / Wq_eV + 6.5 * (1. - 1. / (1. + pow(dfield / 47.408, 1.9851)))
+    HiFieldQy = 1. + 0.4607 / pow(1. + pow(dfield / 621.74, -2.2717), 53.502)
+    QyLvlmedE = 32.988 - 32.988 / (1. + pow(dfield / (0.026715 * np.exp(density / 0.33926)), 0.6705))
+    QyLvlmedE *= HiFieldQy;
+    DokeBirks = 1652.264 + (1.415935e10 - 1652.264) / (1. + pow(dfield / 0.02673144, 1.564691))
+    Nq = energy * 1e3 / Wq_eV
+    LET_power = -2.
+    QyLvlhighE = 28.
+    if (density > 3.100):
+        QyLvlhighE = 49.
+    Qy = QyLvlmedE + (QyLvllowE - QyLvlmedE) / pow(1. + 1.304 * pow(energy, 2.1393), 0.35535) + \
+        QyLvlhighE / (1. + DokeBirks * pow(energy, LET_power))
+    if (Qy > QyLvllowE and energy > 1. and dfield > 1e4):
+        Qy = QyLvllowE;
+    Ly = Nq / energy - Qy;
+    Ne = Qy * energy;
+    Nph = Ly * energy;
+    
+    NexONi =  alpha * erf(0.05 * energy)
+    Ni = Nq / NexONi / (1 + 1 / NexONi)
+    Nex = Nq - Ni
+
+    if (Nex <= 0.):
+        print("\nCAUTION: You are approaching the border of NEST's " +
+            "validity for high-energy NR, or are beyond it, at %f keV.\n" % energy)
+    if (abs(Nex + Ni - Nq) > 2e-6):
+        print("\nERROR: Quanta not conserved. Tell Vetri immediately!\n")
+        sys.exit()
+
+    L = 1.
+    SingTripRatio = 0.20 * pow(energy, -0.45 + 0.0005 * dfield)
+    print(SingTripRatio)
+    
+    return Ni, Nex, Nph, Ne, L, SingTripRatio
 
 
 
@@ -64,4 +107,3 @@ def WorkFunction(density):
     Wq_eV = 20.7 - 1.01e-23 * eDensity
     
     return Wq_eV, alpha
-    
