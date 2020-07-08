@@ -1,0 +1,17 @@
+# For a single image:
+# mode 0 -pid PID -energy energy[keV] -field field[V/cm]
+# 
+# To vary energy:
+# mode 1 -pid PID -energy_range energy_min[keV] energy_max[keV] n_energies -log [True/False] -field field[V/cm]
+# 
+# To vary field:
+# mode 2 -pid PID -energy[keV] -field_range field_min[V/cm] field_max[V/cm] n_fields -log [True/False]
+# 
+# The last two lines should be Reverse = [True/False], indicating whether to loop the gif backwards,
+# and Duration = [time], the duration of each frame in milliseconds.
+# 
+mode 0 -pid ER -energy 8 -field 250 -time 2500
+mode 1 -pid ER -energy_range 3 30 10 -log False -field 100 -time 700
+mode 2 -pid NR -energy 40 -field_range 50 600 10 -log True -time 700
+Reverse = True
+Duration = 1000
