@@ -10,8 +10,8 @@
 # The last two lines should be Reverse = [True/False], indicating whether to loop the gif backwards,
 # and Duration = [time], the duration of each frame in milliseconds.
 # 
-mode 0 -pid ER -energy 8 -field 250 -time 2500
-mode 1 -pid ER -energy_range 3 30 10 -log False -field 100 -time 700
-mode 2 -pid NR -energy 40 -field_range 50 600 10 -log True -time 700
+mode 0 -pid ER -energy 8 -field 250
+mode 1 -pid ER -energy_range 3 30 10 -log False -field 100
+mode 2 -pid NR -energy 40 -field_range 50 600 10 -log True
 Reverse = True
 Duration = 1000
