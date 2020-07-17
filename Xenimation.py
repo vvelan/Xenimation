@@ -21,7 +21,6 @@ def GetFlowImage(pid, eDep, field, savefig=True, output_dir='./', output_filenam
     ax.set_ylim([XC.axes_ymin, 0])
     
     SetColors(pid)
-    SetText(pid, eDep, field)
 
     if (pid == 'NR'):
         Ni, Nex, Nph, Ne, L, SingTripRatio = nest.GetYieldNR(eDep, field, DC.Density)
@@ -30,6 +29,7 @@ def GetFlowImage(pid, eDep, field, savefig=True, output_dir='./', output_filenam
         # An estimate of how much energy goes into heat for ERs
         L = 1. - XC.ER_heat_fraction
 
+    SetText(pid, eDep, field, Ni, Nex, Nph, Ne, SingTripRatio)
     SetArrowWidths(pid, Ni, Nex, Nph, Ne, L, SingTripRatio)
     
     for a in range(len(XC.arrow_properties['name'])):
@@ -61,10 +61,6 @@ def GetFlowImage(pid, eDep, field, savefig=True, output_dir='./', output_filenam
 def SetColors(pid):
     
     XC.arrow_properties['color'][0] = XC.EDep_color
-    XC.text_properties['color'][1] = XC.EDep_color
-    XC.text_properties['color'][2] = XC.EDep_color
-    XC.text_properties['color'][3] = XC.EDep_color
-    XC.text_properties['color'][14] = XC.Credit_color
     for a in range(1, len(XC.arrow_properties['color'])):
         if (pid == 'ER'):
             XC.arrow_properties['color'][a] = XC.ER_color
@@ -73,9 +69,17 @@ def SetColors(pid):
             XC.arrow_properties['color'][a] = XC.NR_color
             XC.text_properties['color'][0] = XC.NR_color
 
+    for t in range(1, 4):
+        XC.text_properties['color'][t] = XC.EDep_color
+
+    XC.text_properties['color'][14] = XC.Credit_color
+
+    for t in range(15, 21):
+        XC.text_properties['color'][t] = XC.NQuanta_color
 
 
-def SetText(pid, eDep, field):
+
+def SetText(pid, eDep, field, Ni, Nex, Nph, Ne, SingTripRatio):
     
     if (pid == 'ER'):
         XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Electronic', 'ER')
@@ -84,6 +88,12 @@ def SetText(pid, eDep, field):
 
     XC.text_properties['text'][2] = XC.text_properties['template'][2] % eDep
     XC.text_properties['text'][3] = XC.text_properties['template'][3] % field
+    XC.text_properties['text'][15] = XC.text_properties['template'][15] % Nex
+    XC.text_properties['text'][16] = XC.text_properties['template'][16] % Ni
+    XC.text_properties['text'][17] = XC.text_properties['template'][17] % (Ni - Ne)
+    XC.text_properties['text'][18] = XC.text_properties['template'][18] % (Nph / (1 + 1 / SingTripRatio))
+    XC.text_properties['text'][19] = XC.text_properties['template'][19] % (Nph / (1 + SingTripRatio))
+    XC.text_properties['text'][20] = XC.text_properties['template'][20] % Ne
 
 
 
