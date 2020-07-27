@@ -11,14 +11,28 @@ XeAtomNumber = 54.
 
 
 
-def GetYieldNR(energy, dfield, density, randomIsotope=0, massNumber=0, detectorMolarMass=0):
+### Get the yields for the NEST NR model.
+### Args:    total recoil energy in keV, drift field in V/cm, liquid xenon density in g/cm3,
+###          boolean variable deciding whether to draw a specific atomic isotope,
+###          atomic mass number to be used if specificIsotope = True (if massNumber = 0, draws a random isotope)
+### Returns: number of ions produced, number of excitons produced, number of photons
+###          leaving the recoil site, number of electrons leaving the recoil site,
+###          Lindhard factor, singlet-to-triplet ratio
+### NOTE: This function is deprecated. It remains in the code for backwards compatibility,
+### but Xenimation now uses NESTpy to get the ER and NR yields. NESTpy allows changes in the NEST model
+### to be propagated into Xenimation.
+### NOTE: the Xenimation GetYieldNR() function might not exactly match output from NESTpy,
+### because the C++ code randomly draws an atomic isotope to calculate the yields, and the
+### NESTpy bindings propagate this stochasticity.
+
+def GetYieldNR(energy, dfield, density, specificIsotope=0, massNumber=0):
 
     NuisParam = np.array([11., 1.1, 0.0480, -0.0533, 12.6, 0.3, 2., 0.3, 2., 0.5, 1., 1.])
     if (energy > 330):
         print("\nWARNING: No data out here, you are beyond the AmBe endpoint of about 300 keV.\n")
     
     ScaleFactor = np.zeros(2)
-    if (randomIsotope):
+    if (specificIsotope):
         if (massNumber == 0):
             massNumber = SelectRanXeAtom()
         ScaleFactor[0] = np.sqrt(DC.DetectorMolarMass / massNumber)
@@ -61,7 +75,18 @@ def GetYieldNR(energy, dfield, density, randomIsotope=0, massNumber=0, detectorM
 
 
 
-def GetYieldER(energy, dfield, density):
+### Get the yields for the NEST beta model.
+### Args:    total recoil energy in keV, drift field in V/cm, liquid xenon density in g/cm3,
+### Returns: number of ions produced, number of excitons produced, number of photons
+###          leaving the recoil site, number of electrons leaving the recoil site,
+###          Lindhard factor, singlet-to-triplet ratio
+### NOTE: This function is deprecated. It remains in the code for backwards compatibility,
+### but Xenimation now uses NESTpy to get the ER and NR yields. NESTpy allows changes in the NEST model
+### to be propagated into Xenimation.
+### NOTE: This function was originally called GetYieldER(). If you are using older code, you may
+### have to rename the function calls.
+
+def GetYieldBeta(energy, dfield, density):
 
     Wq_eV, alpha = WorkFunction(density)
 
@@ -100,6 +125,62 @@ def GetYieldER(energy, dfield, density):
     return Ni, Nex, Nph, Ne, L, SingTripRatio
 
 
+
+### Get the yields for the NEST gamma model.
+### Args:    total recoil energy in keV, drift field in V/cm, liquid xenon density in g/cm3,
+### Returns: number of ions produced, number of excitons produced, number of photons
+###          leaving the recoil site, number of electrons leaving the recoil site,
+###          Lindhard factor, singlet-to-triplet ratio
+### NOTE: This function is deprecated. It remains in the code for backwards compatibility,
+### but Xenimation now uses NESTpy to get the ER and NR yields. NESTpy allows changes in the NEST model
+### to be propagated into Xenimation.
+### NOTE: This function was originally called GetYieldER(). If you are using older code, you may
+### have to rename the function calls.
+
+def GetYieldGamma(energy, dfield, density):
+    
+    Wq_eV, alpha = WorkFunction(density)
+    
+    m1 = 33.951 + (3.3284 - 33.951) / (1. + pow(dfield / 165.34, 0.72665))
+    m2 = 1000. / Wq_eV
+    m3 = 2.
+    m4 = 2.
+    m5 = 23.156 + (10.737 - 23.156) / (1. + pow(dfield / 34.195, 0.87459))
+    m6 = 0.
+    densCorr = 240720. / pow(density, 8.2076)
+    m7 = 66.825 + (829.25 - 66.825) / (1. + pow(dfield / densCorr, 0.83344))
+    m8 = 2.
+
+    Nq = energy * 1000. / Wq_eV
+    Qy = m1 + (m2 - m1) / (1. + pow(energy / m3, m4)) + m5 + (m6 - m5) / (1. + pow(energy / m7, m8))
+    Ly = Nq / energy - Qy
+    Ne = Qy * energy
+    Nph = Ly * energy
+    
+    NexONi =  alpha * erf(0.05 * energy)
+    Ni = Nq / NexONi / (1 + 1 / NexONi)
+    Nex = Nq - Ni
+
+    if (Nex <= 0.):
+        print("\nCAUTION: You are approaching the border of NEST's " +
+            "validity for high-energy NR, or are beyond it, at %f keV.\n" % energy)
+    if (abs(Nex + Ni - Nq) > 2e-6):
+        print("\nERROR: Quanta not conserved. Tell Vetri immediately!\n")
+        sys.exit()
+
+    L = 1.
+    SingTripRatio = 0.20 * pow(energy, -0.45 + 0.0005 * dfield)
+    
+    return Ni, Nex, Nph, Ne, L, SingTripRatio
+
+
+
+### Get the work function for liquid xenon.
+### Args:    liquid xenon density in g/cm3
+### Returns: W-value in eV, alpha (used for calculating Nex/Ni for ER's)
+### NOTE: This function is deprecated. It remains in the code for backwards compatibility,
+### but Xenimation now uses NESTpy to get the ER and NR yields. NESTpy allows changes in the NEST model
+### to be propagated into Xenimation.
 
 def WorkFunction(density):
 
