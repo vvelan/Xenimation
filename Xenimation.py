@@ -75,7 +75,7 @@ def SetColors(pid):
     
     XC.arrow_properties['color'][0] = XC.EDep_color
     for a in range(1, len(XC.arrow_properties['color'])):
-        if (pid == 'ER'):
+        if (pid == 'ER' or pid == 'beta' or pid == 'gamma'):
             XC.arrow_properties['color'][a] = XC.ER_color
             XC.text_properties['color'][0] = XC.ER_color
         elif (pid == 'NR'):
@@ -94,10 +94,10 @@ def SetColors(pid):
 
 def SetText(pid, eDep, field, Ni, Nex, Nph, Ne, SingTripRatio):
     
-    if (pid == 'ER'):
-        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Electronic', 'ER')
+    if (pid == 'ER' or pid == 'beta' or pid == 'gamma'):
+        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Electronic', pid)
     elif (pid == 'NR'):
-        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Nuclear', 'NR')
+        XC.text_properties['text'][0] = XC.text_properties['template'][0] % ('Nuclear', pid)
 
     XC.text_properties['text'][2] = XC.text_properties['template'][2] % eDep
     XC.text_properties['text'][3] = XC.text_properties['template'][3] % field
@@ -223,7 +223,7 @@ def DrawAtom(fig, ax, pid):
     if (pid == 'NR'):
         imreax = fig.add_axes([XC.recoil_NR_left_posr, XC.recoil_NR_bottom_posr, XC.recoil_NR_widthr, XC.recoil_NR_heightr],
             anchor='NE', zorder=-1)
-    elif (pid == 'ER'):
+    elif (pid == 'ER' or pid == 'gamma' or pid == 'beta'):
         imreax = fig.add_axes([XC.recoil_ER_left_posr, XC.recoil_ER_bottom_posr, XC.recoil_ER_widthr, XC.recoil_ER_heightr],
             anchor='NE', zorder=-1)
     imreax.imshow(imre)
