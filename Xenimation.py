@@ -7,7 +7,8 @@ from scipy import interpolate
 from PIL import Image
 import XenimationConfig as XC
 import DetectorConfig as DC
-import NESThelper as nest
+import NESThelper
+import nestpy
 from Xenimation import *
 
 
@@ -22,12 +23,24 @@ def GetFlowImage(pid, eDep, field, savefig=True, output_dir='./', output_filenam
     
     SetColors(pid)
 
-    if (pid == 'NR'):
-        Ni, Nex, Nph, Ne, L, SingTripRatio = nest.GetYieldNR(eDep, field, DC.Density)
-    elif (pid == 'ER'):
-        Ni, Nex, Nph, Ne, L, SingTripRatio = nest.GetYieldER(eDep, field, DC.Density)
+    if pid == 'NR':
+        interaction = nestpy.INTERACTION_TYPE(0)
+    elif pid == 'gamma':
+        interaction = nestpy.INTERACTION_TYPE(7)
+    elif pid == 'beta' or pid == 'ER':
+        interaction = nestpy.INTERACTION_TYPE(8)
+    
+    yields = nestpy.NESTcalc(nestpy.VDetector()).GetYields(interaction,
+        energy=eDep, density=DC.Density, drift_field=field)
+    Ni = (yields.PhotonYield + yields.ElectronYield) / yields.ExcitonRatio / (1. + 1. / yields.ExcitonRatio)
+    Nex = yields.PhotonYield + yields.ElectronYield - Ni
+    Nph = yields.PhotonYield
+    Ne = yields.ElectronYield
+    L = yields.Lindhard
+    if (pid == 'ER' or pid == 'beta' or pid == 'gamma'):
         # An estimate of how much energy goes into heat for ERs
         L = 1. - XC.ER_heat_fraction
+    SingTripRatio = NESThelper.GetSingTripRatio(pid, eDep, field)
 
     SetText(pid, eDep, field, Ni, Nex, Nph, Ne, SingTripRatio)
     SetArrowWidths(pid, Ni, Nex, Nph, Ne, L, SingTripRatio)
