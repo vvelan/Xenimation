@@ -193,3 +193,21 @@ def WorkFunction(density):
     Wq_eV = 20.7 - 1.01e-23 * eDensity
     
     return Wq_eV, alpha
+
+
+
+### Get singlet-to-triplet ratio only.
+### Args:    particle ID (can be 'ER', 'beta', 'gamma', or 'NR')
+### Returns: singlet-to-triplet ratio, or -1000 if invalid particle ID
+
+def GetSingTripRatio(pid, energy, dfield):
+    
+    if pid == 'NR':
+        SingTripRatio = (0.21 - 0.0001 * dfield) * pow(energy, 0.21 - 0.0001 * dfield)
+    elif pid == 'ER' or pid == 'beta' or pid == 'gamma':
+        SingTripRatio = 0.20 * pow(energy, -0.45 + 0.0005 * dfield)
+    else:
+        print('ERROR: invalid particle ID in GetSingTripRatio()')
+        SingTripRatio = -1000.
+        
+    return SingTripRatio
