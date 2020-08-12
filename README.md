@@ -20,3 +20,6 @@ To see some examples of Xenimation output, see the directories Plots_Custom, Plo
 
 See Documentation.md for more detailed documentation on Xenimation.
 
+## Contact
+
+Need help? Notice bugs? Any suggestions for improvement? Contact Vetri Velan <vvelan@berkeley.edu>.
