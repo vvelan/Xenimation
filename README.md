@@ -23,3 +23,5 @@ See Documentation.md for more detailed documentation on Xenimation.
 ## Contact
 
 Need help? Notice bugs? Any suggestions for improvement? Contact Vetri Velan <vvelan@berkeley.edu>.
+
+[![DOI](https://zenodo.org/badge/267977999.svg)](https://zenodo.org/badge/latestdoi/267977999)
